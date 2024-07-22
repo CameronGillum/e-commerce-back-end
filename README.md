@@ -4,11 +4,7 @@
 A database to hold information about tags, categories, and products
 
 ## Walkthrough
-
-
-Uploading Walkthrough.mp4…
-
-
+https://github.com/user-attachments/assets/73c4b446-47c1-49b0-a653-64e371c87838
 
 ## Table of Contents
 - [Installation](#installation)
