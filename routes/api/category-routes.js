@@ -14,17 +14,17 @@ router.get('/', (req, res) => {
       }
     ]
   })
-  .then((categoryData) => res.json(categoryData))
-  .catch((err) => {
-    console.log(err);
-    res.status(500).json(err);
-  });
+    .then((categoryData) => res.json(categoryData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 router.get('/:id', (req, res) => {
   // find one category by its `id` value
   // be sure to include its associated Products
-  Product.findOne({
+  Category.findOne({
     where: { id: req.params.id },
     include: [
       {
@@ -33,26 +33,33 @@ router.get('/:id', (req, res) => {
       }
     ]
   })
-  .then((categoryData) => res.json(categoryData))
-  .catch((err) => {
-    console.log(err);
-    res.status(500).json(err);
-  });
+    .then((categoryData) => res.json(categoryData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 router.post('/', (req, res) => {
   // create a new category
-  Product.create(req.body)
+  /* req.body should look like this...
+    {
+      "category_name" : "Basketball",
+
+    }
+  */
+  Category.create(req.body)
     .then((category) => res.json(category))
     .catch((err) => {
       console.log(err);
       res.status(400).json(err);
     });
-});
+}
+);
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
-  Product.update(req.body, {
+  Category.update(req.body, {
     where: { id: req.params.id }
   })
     .then((category) => res.json(category))
@@ -60,11 +67,12 @@ router.put('/:id', (req, res) => {
       console.log(err);
       res.status(400).json(err);
     });
-});
+}
+);
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
-  Product.destroy({
+  Category.destroy({
     where: { id: req.params.id }
   })
     .then((category) => res.json(category))
@@ -72,6 +80,7 @@ router.delete('/:id', (req, res) => {
       console.log(err);
       res.status(400).json(err);
     });
-});
+}
+);
 
 module.exports = router;

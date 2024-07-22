@@ -14,11 +14,11 @@ router.get('/', (req, res) => {
       }
     ]
   })
-  .then((tagData) => res.json(tagData))
-  .catch((err) => {
-    console.log(err);
-    res.status(500).json(err);
-  });
+    .then((tagData) => res.json(tagData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 router.get('/:id', (req, res) => {
@@ -33,26 +33,58 @@ router.get('/:id', (req, res) => {
       }
     ]
   })
-  .then((tagData) => res.json(tagData))
-  .catch((err) => {
-    console.log(err);
-    res.status(500).json(err);
-  });
-});
-
-router.post('/', (req, res) => {
-  // create a new tag
-  Product.create(req.body)
-    .then((tag) => res.json(tag))
+    .then((tagData) => res.json(tagData))
     .catch((err) => {
       console.log(err);
-      res.status(400).json(err);
+      res.status(500).json(err);
     });
+});
+
+router.post('/', async (req, res) => {
+  // create a new tag
+  // req.body should look like this...
+  // {
+  //   "tag_name": "Basketball",
+  //   "productIds": [1, 2, 3, 4]
+  // }
+  try {
+    const { tag_name, productIds } = req.body;
+
+    // Create the new tag
+    const tag = await Tag.create({ tag_name });
+
+    // Validate product IDs
+    if (productIds && productIds.length) {
+      const validProductIds = await Product.findAll({
+        where: { id: productIds },
+        attributes: ['id']
+      });
+
+      const validIds = validProductIds.map(product => product.id);
+      const invalidIds = productIds.filter(id => !validIds.includes(id));
+
+      if (invalidIds.length) {
+        return res.status(400).json({ message: `Invalid product IDs: ${invalidIds.join(', ')}` });
+      }
+
+      const tagProductIdArr = productIds.map(product_id => ({
+        tag_id: tag.id,
+        product_id,
+      }));
+
+      await ProductTag.bulkCreate(tagProductIdArr);
+    }
+
+    res.status(200).json(tag);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json(err);
+  }
 });
 
 router.put('/:id', (req, res) => {
   // update a tag's name by its `id` value
-  Product.update(req.body, {
+  Tag.update(req.body, {
     where: { id: req.params.id }
   })
     .then((tag) => res.json(tag))
@@ -64,7 +96,7 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete on tag by its `id` value
-  Product.destroy({
+  Tag.destroy({
     where: { id: req.params.id }
   })
     .then((tag) => res.json(tag))
@@ -73,5 +105,6 @@ router.delete('/:id', (req, res) => {
       res.status(400).json(err);
     });
 });
+
 
 module.exports = router;
